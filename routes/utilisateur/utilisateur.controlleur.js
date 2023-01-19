@@ -1,5 +1,7 @@
 const pool = require('../../db')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken') 
+require('dotenv').config()
 
 //!Get Allutilisateur
 exports.getAllUtilisateur = 
@@ -8,6 +10,7 @@ async(req,res) => {
         const allUsers = await pool.query(
             'SELECT * FROM utilisateur'
         )
+        
         res.json(allUsers.rows)
         console.log(allUsers.rows);
         
@@ -15,6 +18,26 @@ async(req,res) => {
         console.warn(err.message);
     }
 };
+
+
+//! Function for VERIFY a TOKEN 
+exports.authFct = (authenticateToken)
+function authenticateToken (req,res,next) {
+    const authHeader = req.headers['authorization']
+    console.log(req.headers);
+    // const TOKEN = authHeader
+    const TOKEN = authHeader && authHeader.split(' ')[1] 
+    console.log('voici le TOKEN : ' ,TOKEN);
+    if (TOKEN == null) return res.sendStatus(401)
+    // 401 unauthorized 
+    jwt.verify(TOKEN, process.env.ACCESS_TOKEN_SECRET , (err,data)=>{
+      if(err) return res.sendStatus(403)
+      // 403 Forbidden 
+      req.user = data
+      console.log('ici USER == > ' ,data);
+      next()  
+    })
+  };
 //!GET one utilisateur
 exports.getOneUtilisateur = 
 async(req,res) => {
@@ -62,7 +85,10 @@ async(req,res)=>{
         //on compare le mot de passe de base avec le mot de passe haché
         const validpassword = await bcrypt.compare(user_mdp,loginUser.rows[0].user_mdp)
         if (!validpassword) return res.status(400).send('invalid password')
-        res.json(loginUser.rows[0])
+        //!générer le TOKEN
+        const username = {name : req.body}
+        const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
+        res.json({loginUser:loginUser.rows[0],accessToken:accessToken});
     } catch (err) {
         console.warn(err.message);
     }
