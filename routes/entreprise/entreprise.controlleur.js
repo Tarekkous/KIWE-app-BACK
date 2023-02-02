@@ -55,7 +55,7 @@ async (req,res)=>{
         const updateEntreprise = pool.query(
             'UPDATE entreprise SET nom_entreprise = $1,nombre_clients_en_attente = $2,temps_attente = $3 WHERE id_entreprise = $4 RETURNING *',[ nom_entreprise,nombre_clients_en_attente,temps_attente,id]
         );
-        res.json(updateEntreprise.rows)
+        res.json("updated")
 
     } catch (err) {
         console.warn(err.message);
@@ -78,3 +78,56 @@ async (req,res)=>{
         console.warn(err.message);
     }
 };
+
+ // *******//************* */
+
+
+//Si temps d'attente par client = 2min , Calcul de temps d'attente :
+//!temps d'attente CALCUL for all societies
+exports.updateTimeAll = 
+async(req,res)=>{
+    try {
+        const updateTimeAll = pool.query(
+            'UPDATE entreprise SET temps_attente = ( nombre_clients_en_attente * 2 )'
+        )
+        res.json('waiting_time updated successfully')
+    } catch (err) {
+        console.warn(err.message);
+    }
+};
+//!Si le user décide d'attendre , on ajoute un client + 2min d'attente
+exports.addClient = 
+async(req,res)=>{
+    try {
+     const {user_mail} = req.body
+     const addClient = pool.query(
+        'UPDATE ENTREPRISE SET NOMBRE_CLIENTS_EN_ATTENTE = NOMBRE_CLIENTS_EN_ATTENTE + 1 WHERE ID_ENTREPRISE IN (SELECT ID_ENTREPRISE FROM UTILISATEUR WHERE USER_MAIL = $1)',[user_mail]).then(()=>{
+            const updateTime = pool.query(
+                'UPDATE entreprise SET temps_attente = ( nombre_clients_en_attente * 2 + 2 ) WHERE id_entreprise = (SELECT ID_ENTREPRISE FROM UTILISATEUR WHERE USER_MAIL = $1)',[user_mail]
+            )
+     res.json('Client added + Time Added!')
+
+        });
+    } catch (err) {
+        console.warn(err.message);
+    }
+};
+//!Si le user décide de quitter ou a fini , on enléve un client + temps d'attente diminue de 2min
+//ensuite on le dissocie de l'entreprise(voir utilisateur-controlleur)
+exports.removeClient = 
+async(req,res)=>{
+    try {
+     const {user_mail} = req.body
+     const removeClient = pool.query
+     ('UPDATE ENTREPRISE SET NOMBRE_CLIENTS_EN_ATTENTE = NOMBRE_CLIENTS_EN_ATTENTE - 1 WHERE ID_ENTREPRISE IN (SELECT ID_ENTREPRISE FROM UTILISATEUR WHERE USER_MAIL = $1)',[user_mail]).then(()=>{
+        const timeReduce = pool.query(
+            'UPDATE entreprise SET temps_attente = (nombre_clients_en_attente * 2 - 2) WHERE ID_ENTREPRISE = (SELECT ID_ENTREPRISE FROM UTILISATEUR WHERE USER_MAIL = $1)',[user_mail]
+        )
+     res.json('Client removed + time reduced!')
+     });
+    } catch (err) {
+        console.warn(err.message);
+    }
+};
+
+

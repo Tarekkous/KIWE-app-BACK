@@ -5,7 +5,7 @@ const pool = new Pool ({
     password : 'database',
     host : 'localhost',
     localhost : 5432,
-    database : 'DB-kiwe'
+    database : 'TestRefDB'
 });
 
 

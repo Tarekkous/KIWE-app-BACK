@@ -1,6 +1,6 @@
 const express = require('express')
 const routerUtilisateur = express.Router()
-const {authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
+const {userDissociated,userAssociate,authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
 
 
 
@@ -9,6 +9,15 @@ routerUtilisateur
 .route('/user')
     .get(authFct,getAllUtilisateur)
     .post(postUtilisateur)
+
+// associer l'utilisateur à l'entreprise consulté par ce dernier en fonction de son mail
+    .put(userAssociate)
+
+routerUtilisateur
+// Dissocier l'utilisateur à l'entreprise consulté par ce dernier en fonction de son mail
+.route('/userDissociate')
+    .put(userDissociated)
+
 routerUtilisateur
 .route('/user/:id')
     .get(getOneUtilisateur)

@@ -12,7 +12,8 @@ async(req,res) => {
         )
         
         res.json(allUsers.rows)
-        console.log(allUsers.rows);
+         const usersFiltred = allUsers.rows.filter(post => post.user_mail === req.user.name.user_mail)
+        console.log(usersFiltred);
         
     } catch (err) {
         console.warn(err.message);
@@ -90,7 +91,9 @@ async(req,res)=>{
         const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
         res.json({loginUser:loginUser.rows[0],accessToken:accessToken});
     } catch (err) {
-        console.warn(err.message);
+        console.warn('erreur : ' ,err.message);
+         res.status(401).send("Please use another mail Adress");
+
     }
 };
 
@@ -125,6 +128,41 @@ async (req,res)=>{
 
     } catch (err) {
         console.warn(err.message);
+    }
+};
+
+//************** *//***************** */
+
+//! Associer l'utilisateur à l'entreprise visité
+exports.userAssociate = 
+async(req,res)=>{
+    try {
+        const {nom_entreprise,user_mail} = req.body
+        const userAssociated = pool.query(
+            'UPDATE utilisateur  SET id_entreprise = (SELECT ID_ENTREPRISE FROM entreprise WHERE nom_entreprise = $1) WHERE user_mail =$2',[nom_entreprise,user_mail])
+            // .then(()=>{
+            //     const changeStatut = pool.query(
+            //         'UPDATE utilisateur SET STATUT = "PAS SERVI" WHERE user_mail = $1',[user_mail]
+            //     )
+            // }
+            // );
+            res.json('User associated correctly')
+    } catch (err) {
+        console.log(err.message);
+    }
+};
+//! Dissocier l'utilisateur de l'entreprise visité
+exports.userDissociated = 
+async(req,res)=>{
+    try {
+        const {user_mail} = req.body
+        const userDissociated = pool.query(
+            'UPDATE utilisateur  SET id_entreprise = NULL WHERE user_mail =$1',
+            [user_mail]
+        )
+        res.json('User dissociated correctly!')
+    } catch (err) {
+        console.log(err.message);
     }
 };
 
