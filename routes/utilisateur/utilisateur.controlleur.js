@@ -105,7 +105,7 @@ async (req,res)=>{
         const {id} = req.params
         const {user_firstname,user_lastname,user_mail, user_mdp, statut} = req.body;
 
-        const updateUtilisateur = pool.query(
+        const updateUtilisateur =await pool.query(
             'UPDATE utilisateur SET user_firstname= $1, user_lastname= $2,user_mail= $3, user_mdp= $4, statut= $5 WHERE id_user= $6 RETURNING *',[user_firstname,user_lastname,user_mail, user_mdp, statut,id]
         );
         res.json(updateUtilisateur.rows)
@@ -121,7 +121,7 @@ async (req,res)=>{
     try {
         const {id} = req.params
 
-        const deleteUtilisateur = pool.query(
+        const deleteUtilisateur =await pool.query(
             'DELETE FROM utilisateur WHERE id_user = $1', [id]
         );
         res.json('user deleted successfully!')
@@ -133,19 +133,30 @@ async (req,res)=>{
 
 //************** *//***************** */
 
+// !Ajout de position de l'utilisateur parmi la file d'attente
+exports.addPosition = 
+async(req,res)=>{
+    try {
+        const {user_mail} = req.body
+        const addPos = await pool.query(
+            'UPDATE utilisateur SET position =((SELECT nombre_clients_en_attente FROM entreprise WHERE USER_MAIL = $1 LIMIT 1)+ 1) WHERE user_mail = $1', [user_mail]
+            
+        )
+        res.json('User position Added!')
+    } catch (err) {
+        console.warn(err.message);
+    }
+}
+
+
 //! Associer l'utilisateur à l'entreprise visité
 exports.userAssociate = 
 async(req,res)=>{
     try {
         const {nom_entreprise,user_mail} = req.body
-        const userAssociated = pool.query(
+        const userAssociated = await pool.query(
             'UPDATE utilisateur  SET id_entreprise = (SELECT ID_ENTREPRISE FROM entreprise WHERE nom_entreprise = $1) WHERE user_mail =$2',[nom_entreprise,user_mail])
-            // .then(()=>{
-            //     const changeStatut = pool.query(
-            //         'UPDATE utilisateur SET STATUT = "PAS SERVI" WHERE user_mail = $1',[user_mail]
-            //     )
-            // }
-            // );
+        
             res.json('User associated correctly')
     } catch (err) {
         console.log(err.message);
@@ -156,7 +167,7 @@ exports.userDissociated =
 async(req,res)=>{
     try {
         const {user_mail} = req.body
-        const userDissociated = pool.query(
+        const userDissociated = await pool.query(
             'UPDATE utilisateur  SET id_entreprise = NULL WHERE user_mail =$1',
             [user_mail]
         )

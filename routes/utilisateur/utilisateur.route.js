@@ -1,6 +1,6 @@
 const express = require('express')
 const routerUtilisateur = express.Router()
-const {userDissociated,userAssociate,authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
+const {addPosition,userDissociated,userAssociate,authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
 
 
 
@@ -14,9 +14,14 @@ routerUtilisateur
     .put(userAssociate)
 
 routerUtilisateur
-// Dissocier l'utilisateur à l'entreprise consulté par ce dernier en fonction de son mail
+// Dissocier l'utilisateur de l'entreprise consulté par ce dernier en fonction de son mail
 .route('/userDissociate')
     .put(userDissociated)
+
+routerUtilisateur
+// on ajoute une position à l'utilisateur en fonction de nombre de clients
+.route('/addPos')
+    .put(addPosition)
 
 routerUtilisateur
 .route('/user/:id')
