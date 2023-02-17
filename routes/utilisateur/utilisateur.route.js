@@ -1,6 +1,6 @@
 const express = require('express')
 const routerUtilisateur = express.Router()
-const {addPosition,userDissociated,userAssociate,authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
+const {loginAdmin,addPosition,userDissociated,userAssociate,authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
 
 
 
@@ -32,6 +32,10 @@ routerUtilisateur
     .route('/login')
     .post(postLogin)
 
+    // Admin !!!! 
+routerUtilisateur
+    .route('/loginAdmin')
+    .post(loginAdmin)
 
 
 

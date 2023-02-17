@@ -177,3 +177,52 @@ async(req,res)=>{
     }
 };
 
+
+
+//Admin !!!!! *******************************************************
+
+
+//!POST loginAdmin
+exports.loginAdmin = 
+async(req,res)=>{
+    try {
+        const {user_mdp,user_mail} = req.body
+        const loginAdmin = await pool.query(
+            'SELECT * FROM utilisateur WHERE user_mail=$1',[user_mail]
+        );
+            console.log(loginAdmin.rows[0]);
+        // on vérifie si on reçoit le compte de l'utilisateur
+        if (loginAdmin.rows.length === 0) return res.status(401).send('invalid mail')
+        //on compare le mot de passe de base avec le mot de passe haché
+        const validpassword = await bcrypt.compare(user_mdp,loginAdmin.rows[0].user_mdp)
+        if (!validpassword) return res.status(400).send('invalid password')
+         const statut = loginAdmin.rows[0].statut;
+            //on vérifie si l'utilisateur est un commerçant
+         if (statut !== 'commerçant') {
+        return res.json({ message: 'Accès refusé' });
+    }
+        //!générer le TOKEN
+        const username = {name : req.body}
+        const accessToken = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET)
+        res.json({loginAdmin:loginAdmin.rows[0],accessToken:accessToken});
+    } catch (err) {
+        console.warn('erreur : ' ,err.message);
+         res.status(401).send("Please use another mail Adress");
+
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

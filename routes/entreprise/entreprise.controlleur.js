@@ -121,13 +121,13 @@ async(req,res)=>{
      const removeClient = await pool.query
      ('UPDATE ENTREPRISE SET NOMBRE_CLIENTS_EN_ATTENTE = NOMBRE_CLIENTS_EN_ATTENTE - 1 WHERE ID_ENTREPRISE IN (SELECT ID_ENTREPRISE FROM UTILISATEUR WHERE USER_MAIL = $1)',[user_mail]).then(()=>{
         const timeReduce = pool.query(
-            'UPDATE entreprise SET temps_attente = (nombre_clients_en_attente * 2 - 2) WHERE ID_ENTREPRISE = (SELECT ID_ENTREPRISE FROM UTILISATEUR WHERE USER_MAIL = $1)',[user_mail]
+            'UPDATE entreprise SET temps_attente = (NOMBRE_CLIENTS_EN_ATTENTE * 2 - 2) WHERE ID_ENTREPRISE = (SELECT ID_ENTREPRISE FROM UTILISATEUR WHERE USER_MAIL = $1)',[user_mail]
         )
      res.json('Client removed + time reduced!')
      });
     } catch (err) {
         console.warn(err.message);
-    }
+    };
 };
 
 
