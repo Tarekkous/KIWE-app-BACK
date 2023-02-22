@@ -104,9 +104,10 @@ async (req,res)=>{
     try {
         const {id} = req.params
         const {user_firstname,user_lastname,user_mail, user_mdp, statut} = req.body;
+        const password = await bcrypt.hash(user_mdp,10)
 
         const updateUtilisateur =await pool.query(
-            'UPDATE utilisateur SET user_firstname= $1, user_lastname= $2,user_mail= $3, user_mdp= $4, statut= $5 WHERE id_user= $6 RETURNING *',[user_firstname,user_lastname,user_mail, user_mdp, statut,id]
+            'UPDATE utilisateur SET user_firstname= $1, user_lastname= $2,user_mail= $3, user_mdp= $4, statut= $5 WHERE id_user= $6 RETURNING *',[user_firstname,user_lastname,user_mail, password, statut,id]
         );
         res.json(updateUtilisateur.rows)
 
@@ -146,7 +147,7 @@ async(req,res)=>{
     } catch (err) {
         console.warn(err.message);
     }
-}
+};
 
 
 //! Associer l'utilisateur à l'entreprise visité
@@ -179,17 +180,18 @@ async(req,res)=>{
 
 
 
-//Admin !!!!! *******************************************************
+//Admin !!!!! *************************************************************
 
 
 //!POST loginAdmin
+//authentification sécurisé (connexion) de l'administrateur
 exports.loginAdmin = 
 async(req,res)=>{
     try {
         const {user_mdp,user_mail} = req.body
         const loginAdmin = await pool.query(
             'SELECT * FROM utilisateur WHERE user_mail=$1',[user_mail]
-        );
+        )
             console.log(loginAdmin.rows[0]);
         // on vérifie si on reçoit le compte de l'utilisateur
         if (loginAdmin.rows.length === 0) return res.status(401).send('invalid mail')
@@ -212,7 +214,38 @@ async(req,res)=>{
     }
 };
 
+//!get all clients
 
+//récupérer tout les clients appartenants à l'entreprise de l'admin en fonction de son ID
+exports.getClients =
+async (req,res)=>{
+    try {
+      const {id} = req.params  
+      const getAllClients = await pool.query(
+        'SELECT * FROM utilisateur WHERE statut = $1 AND id_entreprise = $2 AND position IS NOT NULL ',['client',id]
+      );
+      
+      console.log(getAllClients.rows[0]);
+
+      res.json(getAllClients.rows)
+    } catch (err) {
+        console.warn(err.message);
+    }
+};
+
+// !Ajout de position de l'utilisateur parmi la file d'attente
+exports.removePosition = 
+async(req,res)=>{
+    try {
+        const {user_mail} = req.body
+        const removePos = await pool.query(
+            'UPDATE utilisateur SET position = 0 WHERE user_mail = $1', [user_mail]
+        )
+        res.json('User position Removed!')
+    } catch (err) {
+        console.warn(err.message);
+    }
+}
 
 
 

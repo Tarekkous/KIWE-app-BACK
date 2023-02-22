@@ -1,10 +1,10 @@
 const express = require('express')
 const routerUtilisateur = express.Router()
-const {loginAdmin,addPosition,userDissociated,userAssociate,authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
+const {removePosition,getClients,loginAdmin,addPosition,userDissociated,userAssociate,authFct,postLogin,deleteUtilisateur,updateUtilisateur,getOneUtilisateur,getAllUtilisateur, postUtilisateur} = require('./utilisateur.controlleur')
 
 
 
-//!CRUD entreprise
+//!CRUD entreprise in client mode
 routerUtilisateur
 .route('/user')
     .get(authFct,getAllUtilisateur)
@@ -32,13 +32,17 @@ routerUtilisateur
     .route('/login')
     .post(postLogin)
 
-    // Admin !!!! 
+    //! CRUD entreprise in ADMIN mode !!!! ****
 routerUtilisateur
     .route('/loginAdmin')
     .post(loginAdmin)
 
-
-
+routerUtilisateur
+    .route('/clients/:id')
+    .get(getClients)
+routerUtilisateur
+    .route('/posClient')
+    .put(removePosition)
 
 
 

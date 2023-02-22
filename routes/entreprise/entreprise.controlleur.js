@@ -131,3 +131,24 @@ async(req,res)=>{
 };
 
 
+// ****************************ADMIN / **********************************
+
+
+
+
+
+//!Si le user décide de quitter ou a fini , on enléve un client + temps d'attente diminue de 2min
+//ensuite on le dissocie de l'entreprise(voir utilisateur-controlleur)
+exports.reduceTimeCompany = 
+async(req,res)=>{
+    try {
+       const {id} = req.body
+        const timeReduce = pool.query(
+            'UPDATE entreprise SET temps_attente = (temps_attente - 2) WHERE ID_ENTREPRISE = $1',[id]
+        )
+     res.json('time reduced!')
+     
+    } catch (err) {
+        console.warn(err.message);
+    };
+};

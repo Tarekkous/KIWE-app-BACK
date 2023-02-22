@@ -1,6 +1,6 @@
 const express = require('express')
 const routerEntreprise = express.Router()
-const {removeClient,addClient,updateTimeAll,deleteEntreprise,updateEntreprise,getAllEntreprises,getOneEntreprise,postEntreprise} = require('./entreprise.controlleur')
+const {reduceTimeCompany,removeClient,addClient,updateTimeAll,deleteEntreprise,updateEntreprise,getAllEntreprises,getOneEntreprise,postEntreprise} = require('./entreprise.controlleur')
 
 
 
@@ -21,11 +21,14 @@ routerEntreprise
 .route('/entrepriseAddClient')
     .put(addClient)
 routerEntreprise
-    //on enléve un client &  -2min temps d'attente
+    //on enlève un client &  -2min temps d'attente
     .route('/entrepriseReload')
         .put(removeClient)
     
-
+routerEntreprise
+        //on enlève -2min temps d'attente
+        .route('/company/:id')
+            .put(reduceTimeCompany)
 
 
 
