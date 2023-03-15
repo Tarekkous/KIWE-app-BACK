@@ -6,7 +6,8 @@
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "nodemon": "^2.0.20",
-    "pg": "^8.8.0"
+    "pg": "^8.8.0",
+    "socket.io": "^4.6.1"
   },
   "scripts": {
     "nodemon": "nodemon app.js",

@@ -2,6 +2,11 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 
+//socket IO
+const http = require('http');
+const socketIO = require('socket.io');
+const server = http.createServer(app);
+const io = socketIO(server);
 
 
 // les routes 

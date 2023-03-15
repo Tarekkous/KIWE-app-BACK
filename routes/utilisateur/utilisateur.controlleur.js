@@ -233,7 +233,7 @@ async (req,res)=>{
     }
 };
 
-// !Ajout de position de l'utilisateur parmi la file d'attente
+// !Enlever position de l'utilisateur parmi la file d'attente
 exports.removePosition = 
 async(req,res)=>{
     try {
